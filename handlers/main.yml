@@ -1,10 +1,9 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
 # handlers file for ansible-role-webserver
 # Handlers are triggered by 'notify' in tasks.
 # They use OS-specific commands loaded by include_vars.
 
-# ── Ubuntu/Debian ────────────────────────────────────────────────────────────
 - name: Restart webserver (Debian)
   ansible.builtin.command: service apache2 restart
   listen: "Restart webserver"
@@ -17,7 +16,6 @@
   when: ansible_os_family == 'Debian'
   failed_when: false
 
-# ── RedHat/Rocky ─────────────────────────────────────────────────────────────
 - name: Restart webserver (RedHat)
   ansible.builtin.shell: >
     pkill -HUP httpd || /usr/sbin/httpd &

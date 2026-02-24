@@ -20,7 +20,7 @@
     state: present
     update_cache: true
   when: ansible_os_family == 'RedHat'
-  failed_when: false   # epel-release may already be included in some Rocky images
+  failed_when: false
 
 - name: Install required packages (RedHat/Rocky)
   ansible.builtin.dnf:
