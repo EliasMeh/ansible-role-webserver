@@ -1,0 +1,27 @@
+---
+# vars/Debian.yml – Ubuntu / Debian specific variables
+
+apache_service: apache2
+
+http_packages:
+  - apache2
+  - php
+  - libapache2-mod-php
+  - php-mysql
+  - mariadb-server
+  - wget
+  - unzip
+  - python3-pymysql
+
+apache_conf_dir: /etc/apache2/sites-available
+apache_user: www-data
+apache_group: www-data
+mysql_socket: /var/run/mysqld/mysqld.sock
+
+# Commands used in handlers (containers have no systemd)
+apache_start_cmd: "service apache2 start"
+apache_restart_cmd: "service apache2 restart"
+apache_reload_cmd: "service apache2 reload"
+
+# Ubuntu uses a2ensite / a2enmod
+use_a2ensite: true

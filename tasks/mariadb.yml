@@ -1,0 +1,66 @@
+---
+# tasks/mariadb.yml – Start MariaDB and initialise databases
+
+# ── Start MariaDB in background (containers have no systemd) ─────────────────
+- name: Start MariaDB in background
+  ansible.builtin.shell: >
+    mysqld_safe --datadir=/var/lib/mysql &
+  args:
+    creates: "{{ mysql_socket }}"   # idempotence: skip if socket already exists
+  async: 5
+  poll: 0
+
+- name: Wait for MariaDB socket to appear
+  ansible.builtin.wait_for:
+    path: "{{ mysql_socket }}"
+    state: present
+    timeout: 30
+
+# ── Secure the installation ──────────────────────────────────────────────────
+- name: Set MariaDB root password
+  community.mysql.mysql_user:
+    name: root
+    host: localhost
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ mysql_socket }}"
+    check_implicit_admin: true
+    state: present
+  no_log: true
+
+- name: Remove anonymous MariaDB users
+  community.mysql.mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ mysql_socket }}"
+
+- name: Remove MariaDB test database
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ mysql_socket }}"
+
+# ── WordPress database & user ────────────────────────────────────────────────
+- name: Create WordPress database
+  community.mysql.mysql_db:
+    name: "{{ wp_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ mysql_socket }}"
+
+- name: Create WordPress database user
+  community.mysql.mysql_user:
+    name: "{{ wp_db_user }}"
+    host: "{{ wp_db_host }}"
+    password: "{{ wp_db_password }}"
+    priv: "{{ wp_db_name }}.*:ALL"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: "{{ mysql_socket }}"
+  no_log: true

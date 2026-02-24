@@ -1,0 +1,30 @@
+---
+# tasks/install.yml – Install required system packages
+
+- name: Update apt cache (Debian/Ubuntu)
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_os_family == 'Debian'
+
+- name: Install required packages (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ http_packages }}"
+  when: ansible_os_family == 'Debian'
+
+- name: Install EPEL and update dnf cache (RedHat/Rocky)
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+    update_cache: true
+  when: ansible_os_family == 'RedHat'
+  failed_when: false   # epel-release may already be included in some Rocky images
+
+- name: Install required packages (RedHat/Rocky)
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ http_packages }}"
+  when: ansible_os_family == 'RedHat'

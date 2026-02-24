@@ -1,0 +1,15 @@
+#SPDX-License-Identifier: MIT-0
+# Test inventory – matches the docker-compose.yaml container topology
+
+[ubuntu]
+client1 ansible_host=client1 ansible_user=root ansible_port=22
+client2 ansible_host=client2 ansible_user=root ansible_port=22
+
+[rocky]
+client3 ansible_host=client3 ansible_user=root ansible_port=22
+client4 ansible_host=client4 ansible_user=root ansible_port=22
+
+[webservers:children]
+ubuntu
+rocky
+

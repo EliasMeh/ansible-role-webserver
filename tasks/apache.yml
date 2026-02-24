@@ -1,0 +1,42 @@
+---
+# tasks/apache.yml – Deploy virtual-host config and start Apache / httpd
+
+- name: Deploy WordPress virtual-host configuration
+  ansible.builtin.template:
+    src: wordpress.conf.j2
+    dest: "{{ apache_conf_dir }}/wordpress.conf"
+    mode: '0644'
+  notify: Reload webserver
+
+# ── Ubuntu/Debian only ───────────────────────────────────────────────────────
+- name: Enable mod_rewrite (Debian/Ubuntu)
+  ansible.builtin.command: a2enmod rewrite
+  args:
+    creates: /etc/apache2/mods-enabled/rewrite.load
+  when: use_a2ensite | bool
+  notify: Restart webserver
+
+- name: Enable WordPress site (Debian/Ubuntu)
+  ansible.builtin.command: a2ensite wordpress.conf
+  args:
+    creates: /etc/apache2/sites-enabled/wordpress.conf
+  when: use_a2ensite | bool
+  notify: Reload webserver
+
+# ── Start / ensure web server is running ─────────────────────────────────────
+- name: Start Apache web server (Debian/Ubuntu – container)
+  ansible.builtin.command: service apache2 start
+  when: ansible_os_family == 'Debian'
+  changed_when: false
+  failed_when: false
+
+- name: Start httpd web server (RedHat/Rocky – container)
+  ansible.builtin.shell: >
+    pgrep -x httpd || nohup /usr/sbin/httpd -DFOREGROUND &
+  when: ansible_os_family == 'RedHat'
+  changed_when: false
+  failed_when: false
+
+# Force any pending handlers to run immediately (e.g. reload after a2ensite)
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

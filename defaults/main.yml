@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for ansible-role-webserver
+
+# ── WordPress Database ──────────────────────────────────────────────────────
+wp_db_name: wordpress
+wp_db_user: wpuser
+wp_db_password: wppassword
+wp_db_host: localhost
+
+# ── MariaDB root ─────────────────────────────────────────────────────────────
+mysql_root_password: rootpassword
+
+# ── WordPress download / install ─────────────────────────────────────────────
+wp_download_url: "https://wordpress.org/latest.zip"
+wp_install_dir: /var/www/html
+
+# ── Apache virtual-host ──────────────────────────────────────────────────────
+apache_server_admin: admin@localhost
+apache_server_name: localhost

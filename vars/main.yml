@@ -1,0 +1,5 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for ansible-role-webserver
+# OS-specific variables are loaded dynamically from vars/Debian.yml or vars/RedHat.yml
+# by the first task in tasks/main.yml (include_vars).

@@ -1,0 +1,22 @@
+# Managed by Ansible – do not edit manually.
+# Role: ansible-role-webserver  |  Host: {{ inventory_hostname }}
+
+<VirtualHost *:80>
+    ServerAdmin {{ apache_server_admin }}
+    ServerName  {{ apache_server_name }}
+    DocumentRoot {{ wp_install_dir }}
+
+    <Directory {{ wp_install_dir }}>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+{% if ansible_os_family == 'Debian' %}
+    ErrorLog  ${APACHE_LOG_DIR}/wordpress-error.log
+    CustomLog ${APACHE_LOG_DIR}/wordpress-access.log combined
+{% else %}
+    ErrorLog  /var/log/httpd/wordpress-error.log
+    CustomLog /var/log/httpd/wordpress-access.log combined
+{% endif %}
+</VirtualHost>

@@ -1,0 +1,23 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible-role-webserver
+
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  tags: always
+
+- name: Install system packages
+  ansible.builtin.include_tasks: install.yml
+  tags: install
+
+- name: Configure MariaDB
+  ansible.builtin.include_tasks: mariadb.yml
+  tags: mariadb
+
+- name: Download and configure WordPress
+  ansible.builtin.include_tasks: wordpress.yml
+  tags: wordpress
+
+- name: Configure and start the web server
+  ansible.builtin.include_tasks: apache.yml
+  tags: apache

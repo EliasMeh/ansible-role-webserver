@@ -1,0 +1,51 @@
+---
+# tasks/wordpress.yml – Download, extract and configure WordPress
+
+- name: Check whether WordPress is already installed
+  ansible.builtin.stat:
+    path: "{{ wp_install_dir }}/wp-login.php"
+  register: wp_installed
+
+- name: Download WordPress archive
+  ansible.builtin.get_url:
+    url: "{{ wp_download_url }}"
+    dest: /tmp/wordpress.zip
+    mode: '0644'
+  when: not wp_installed.stat.exists
+
+- name: Unzip WordPress archive
+  ansible.builtin.unarchive:
+    src: /tmp/wordpress.zip
+    dest: /tmp/
+    remote_src: true
+  when: not wp_installed.stat.exists
+
+- name: Copy WordPress files to web root
+  ansible.builtin.copy:
+    src: /tmp/wordpress/
+    dest: "{{ wp_install_dir }}/"
+    remote_src: true
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0755'
+  when: not wp_installed.stat.exists
+
+- name: Remove default Apache/httpd index page
+  ansible.builtin.file:
+    path: "{{ wp_install_dir }}/index.html"
+    state: absent
+
+- name: Set ownership recursively on web root
+  ansible.builtin.file:
+    path: "{{ wp_install_dir }}"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    recurse: true
+
+- name: Deploy wp-config.php from template
+  ansible.builtin.template:
+    src: wp-config.php.j2
+    dest: "{{ wp_install_dir }}/wp-config.php"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: '0640'

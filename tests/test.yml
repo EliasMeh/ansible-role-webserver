@@ -1,0 +1,25 @@
+#SPDX-License-Identifier: MIT-0
+---
+# Test playbook for ansible-role-webserver
+# Run with: ansible-playbook -i tests/inventory tests/test.yml
+- name: Deploy WordPress on Ubuntu containers
+  hosts: ubuntu
+  become: true
+  vars:
+    mysql_root_password: "TestRoot123!"
+    wp_db_password: "TestWP123!"
+    wp_db_user: "wptest"
+    wp_db_name: "wordpress_test"
+  roles:
+    - role: ../
+
+- name: Deploy WordPress on Rocky Linux containers
+  hosts: rocky
+  become: true
+  vars:
+    mysql_root_password: "TestRoot123!"
+    wp_db_password: "TestWP123!"
+    wp_db_user: "wptest"
+    wp_db_name: "wordpress_test"
+  roles:
+    - role: ../

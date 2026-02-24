@@ -1,0 +1,27 @@
+---
+# vars/RedHat.yml – Rocky Linux / RHEL specific variables
+
+apache_service: httpd
+
+http_packages:
+  - httpd
+  - php
+  - php-mysqlnd
+  - php-json
+  - mariadb-server
+  - wget
+  - unzip
+  - python3-PyMySQL
+
+apache_conf_dir: /etc/httpd/conf.d
+apache_user: apache
+apache_group: apache
+mysql_socket: /var/lib/mysql/mysql.sock
+
+# Commands used in handlers (containers typically have no systemd)
+apache_start_cmd: "nohup /usr/sbin/httpd -DFOREGROUND &"
+apache_restart_cmd: "pkill -HUP httpd || /usr/sbin/httpd &"
+apache_reload_cmd: "/usr/sbin/httpd -k graceful"
+
+# Rocky auto-loads conf.d — no a2ensite needed
+use_a2ensite: false
